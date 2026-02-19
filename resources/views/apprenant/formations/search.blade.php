@@ -1,0 +1,107 @@
+@extends('layouts.app')
+
+@section('title', 'Résultats de recherche - EduForm')
+
+@section('content')
+<div class="container py-5">
+    <!-- En-tête -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-4 fw-bold mb-3">
+                @if($searchTerm)
+                    Résultats pour "{{ $searchTerm }}"
+                @else
+                    Toutes les formations
+                @endif
+            </h1>
+            <p class="lead text-muted">{{ $formations->total() }} formation(s) trouvée(s)</p>
+        </div>
+    </div>
+
+    <!-- Filtres -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <form action="{{ route('formations.search') }}" method="GET" class="row g-3">
+                <div class="col-md-6">
+                    <input type="text" 
+                           name="search" 
+                           class="form-control form-control-lg rounded-pill" 
+                           placeholder="Rechercher une formation..."
+                           value="{{ $searchTerm }}">
+                </div>
+                <div class="col-md-4">
+                    <select name="categorie" class="form-select form-select-lg rounded-pill">
+                        <option value="">Toutes les catégories</option>
+                        @foreach($categories as $cat)
+                            <option value="{{ $cat->categorie }}" {{ $selectedCategorie == $cat->categorie ? 'selected' : '' }}>
+                                {{ $cat->categorie }} ({{ $cat->total }})
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary btn-lg rounded-pill w-100">
+                        <i class="bi bi-search"></i> Filtrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Résultats -->
+    <div class="row g-4">
+        @forelse($formations as $formation)
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm rounded-4">
+                <img src="{{ $formation->image_url ?? 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80' }}" 
+                     class="card-img-top rounded-top-4" 
+                     alt="{{ $formation->titre }}"
+                     style="height: 200px; object-fit: cover;">
+                
+                <div class="card-body p-4">
+                    <h5 class="card-title fw-bold mb-3">{{ $formation->titre }}</h5>
+                    
+                    <p class="card-text text-muted mb-3">
+                        {{ Str::limit($formation->description, 100) }}
+                    </p>
+                    
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-light rounded-circle p-2 me-2">
+                            <i class="bi bi-person-circle text-primary"></i>
+                        </div>
+                        <small class="text-muted">{{ $formation->formateur->nom ?? 'Formateur' }}</small>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge bg-primary rounded-pill px-3 py-2">
+                            <i class="bi bi-calendar me-1"></i>
+                            {{ \Carbon\Carbon::parse($formation->date_debut)->format('d/m/Y') }}
+                        </span>
+                        
+                        <a href="{{ route('formations.show', $formation->id) }}" class="btn btn-outline-primary rounded-pill px-4">
+                            Voir plus <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @empty
+        <div class="col-12">
+            <div class="text-center py-5">
+                <i class="bi bi-emoji-frown display-1 text-muted"></i>
+                <h3 class="mt-4">Aucune formation trouvée</h3>
+                <p class="text-muted">Essayez avec d'autres mots-clés ou catégories</p>
+                <a href="{{ route('formations') }}" class="btn btn-primary rounded-pill px-5 py-3 mt-3">
+                    Voir toutes les formations
+                </a>
+            </div>
+        </div>
+        @endforelse
+    </div>
+
+    <!-- Pagination -->
+    <div class="d-flex justify-content-center mt-5">
+        {{ $formations->links() }}
+    </div>
+</div>
+@endsection
