@@ -1,59 +1,274 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+Structure Logique (Diagramme)
+User
+- id
+- name
+- email
+- password
+- role (admin, formateur, apprenant)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Formation
+- id
+- titre
+- description
+- formateur_id
+- statut
 
-## About Laravel
+Module
+- id
+- titre
+- formation_id
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Contenu
+- id
+- titre
+- type
+- module_id
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Ressource
+- id
+- fichier
+- contenu_id
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Inscription
+- id
+- user_id
+- formation_id
 
-## Learning Laravel
+Evaluation
+- id
+- note
+- commentaire
+- inscription_id
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Plateforme de Gestion de Formations
 
-## Laravel Sponsors
+Projet Laravel API + Application Flutter
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Présentation
 
-### Premium Partners
+Cette application est une plateforme e-learning permettant de gérer des formations en ligne avec trois rôles :
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Administrateur → gère la plateforme
 
-## Contributing
+Formateur → crée le contenu pédagogique
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Apprenant → suit les formations
 
-## Code of Conduct
+Le back-end est développé avec Laravel (API REST) et le front-end mobile avec Flutter.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Architecture du Projet
+Technologie	Rôle
+Laravel 12	API REST & logique métier
+MySQL	Base de données
+Flutter	Application mobile
+Sanctum / Token API	Authentification
+JSON	Communication API
 
-## Security Vulnerabilities
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
-## License
+Analyse des Acteurs et Cas d’Utilisation
+1. ADMIN — Gestionnaire du Système
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+L’admin ne crée pas le contenu pédagogique, il administre la plateforme.
+
+Fonctionnalités :
+
+Créer / gérer les utilisateurs (formateurs, apprenants)
+
+Créer les formations (structure globale)
+
+Affecter un formateur à une formation
+
+Activer / désactiver une formation
+
+Suivre les statistiques
+
+Gérer les inscriptions
+
+Modérer les évaluations et messages
+
+2. FORMATEUR — Créateur de Contenu
+
+Le formateur ne crée pas la formation, il construit le contenu.
+
+Fonctionnalités :
+
+Créer des modules
+
+Ajouter des contenus pédagogiques
+
+Ajouter des ressources (PDF, vidéos…)
+
+Suivre les apprenants inscrits
+
+Répondre aux messages
+
+Consulter les évaluations
+
+3. APPRENANT — Utilisateur de la Formation
+
+L’apprenant ne crée rien.
+
+Fonctionnalités :
+
+S’inscrire à une formation
+
+Consulter les modules et contenus
+
+Télécharger les ressources
+
+Envoyer des messages
+
+Donner une évaluation
+
+Suivre sa progression
+
+MCD — Modèle Conceptuel de Données
+Entités Principales
+
+User
+
+Formation
+
+Module
+
+Contenu
+
+Ressource
+
+Inscription
+
+Evaluation
+
+Message
+
+Relations
+
+Un Formateur est affecté à plusieurs Formations
+
+Une Formation contient plusieurs Modules
+
+Un Module contient plusieurs Contenus
+
+Un Contenu peut avoir plusieurs Ressources
+
+Un Apprenant peut s’inscrire à plusieurs Formations
+
+Une Inscription relie Apprenant ↔ Formation
+
+Une Evaluation appartient à une Inscription
+ Structure Logique (Diagramme de Classe Simplifié)
+User
+- id
+- name
+- email
+- password
+- role (admin, formateur, apprenant)
+
+Formation
+- id
+- titre
+- description
+- formateur_id
+- statut
+
+Module
+- id
+- titre
+- formation_id
+
+Contenu
+- id
+- titre
+- type
+- module_id
+
+Ressource
+- id
+- fichier
+- contenu_id
+
+Inscription
+- id
+- user_id
+- formation_id
+
+Evaluation
+- id
+- note
+- commentaire
+- inscription_id
+Connexion Flutter ↔ Laravel (API)
+
+L’application Flutter communique avec Laravel via API sécurisée.
+
+ Authentification API
+Méthode	Route	Description
+POST	/api/register	Inscription
+POST	/api/login	Connexion
+GET	/api/formations	Liste formations
+POST	/api/inscriptions	S’inscrire
+GET	/api/modules/{id}	Voir contenu
+📱 Exemple de Login Flutter
+final response = await http.post(
+  Uri.parse("http://10.0.2.2:8000/api/login"),
+  body: {
+    "email": email,
+    "password": password
+  },
+);
+
+final token = jsonDecode(response.body)['token'];
+
+Utilisation du token :
+
+headers: {
+  "Authorization": "Bearer $token",
+  "Accept": "application/json"
+}
+⚙️ Installation du Projet Laravel
+git clone projet.git
+cd projet
+
+composer install
+cp .env.example .env
+php artisan key:generate
+
+php artisan migrate
+php artisan serve
+Lancer Flutter
+cd flutter_app
+flutter pub get
+flutter run
+Objectif du Projet
+
+Ce projet met en pratique :
+ (Acteurs, MCD)
+
+Architecture API REST
+
+Laravel comme Back-End
+
+Flutter comme Client Mobile
+
+Authentification par Token
+
+Gestion complète d’une plateforme de formation
+
+✅ Résultat
+
+Une plateforme moderne permettant :
+
+✔ Gestion centralisée des formations
+✔ Séparation claire des rôles (Admin / Formateur / Apprenant)
+✔ Accès mobile via Flutter
+✔ Architecture professionnelle basée sur API
+
+Si tu veux maintenant, je peux aussi t’ajouter :
+
+le MLD (tables SQL exactes)
+
+les routes API documentées
+
+ou vérifier que ça correspond exactement à tes Models Laravel.
