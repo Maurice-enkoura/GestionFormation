@@ -1,28 +1,28 @@
-{{-- resources/views/admin/messages/index.blade.php --}}
-@extends('layouts.admin')
 
-@section('title', 'Messages - Administration')
-@section('page-title', 'Gestion des messages')
-@section('page-subtitle', 'Admin / Messages')
 
-@section('content')
+
+<?php $__env->startSection('title', 'Messages - Administration'); ?>
+<?php $__env->startSection('page-title', 'Gestion des messages'); ?>
+<?php $__env->startSection('page-subtitle', 'Admin / Messages'); ?>
+
+<?php $__env->startSection('content'); ?>
 <!-- Filtres -->
 <div class="row mb-4">
     <div class="col-12">
         <div class="card">
             <div class="card-body">
-                <form action="{{ route('admin.messages.index') }}" method="GET" class="row g-3">
+                <form action="<?php echo e(route('admin.messages.index')); ?>" method="GET" class="row g-3">
                     <div class="col-md-4">
-                        <input type="text" name="search" class="form-control" placeholder="Rechercher dans les messages..." value="{{ request('search') }}">
+                        <input type="text" name="search" class="form-control" placeholder="Rechercher dans les messages..." value="<?php echo e(request('search')); ?>">
                     </div>
                     <div class="col-md-3">
                         <select name="user_id" class="form-select">
                             <option value="">Tous les utilisateurs</option>
-                            @foreach($users as $user)
-                                <option value="{{ $user->id }}" {{ request('user_id') == $user->id ? 'selected' : '' }}>
-                                    {{ $user->nom }} ({{ ucfirst($user->role) }})
+                            <?php $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($user->id); ?>" <?php echo e(request('user_id') == $user->id ? 'selected' : ''); ?>>
+                                    <?php echo e($user->nom); ?> (<?php echo e(ucfirst($user->role)); ?>)
                                 </option>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </select>
                     </div>
                     <div class="col-md-2">
@@ -31,7 +31,7 @@
                         </button>
                     </div>
                     <div class="col-md-3 text-end">
-                        <a href="{{ route('admin.messages.index') }}" class="btn btn-outline-secondary">
+                        <a href="<?php echo e(route('admin.messages.index')); ?>" class="btn btn-outline-secondary">
                             <i class="bi bi-arrow-counterclockwise"></i> Réinitialiser
                         </a>
                     </div>
@@ -49,7 +49,7 @@
                 <i class="bi bi-chat text-primary"></i>
             </div>
             <div class="stat-info">
-                <h4>{{ $stats['total'] }}</h4>
+                <h4><?php echo e($stats['total']); ?></h4>
                 <p>Messages totaux</p>
             </div>
         </div>
@@ -60,7 +60,7 @@
                 <i class="bi bi-calendar-day text-success"></i>
             </div>
             <div class="stat-info">
-                <h4>{{ $stats['aujourd_hui'] }}</h4>
+                <h4><?php echo e($stats['aujourd_hui']); ?></h4>
                 <p>Messages aujourd'hui</p>
             </div>
         </div>
@@ -76,13 +76,13 @@
         </h5>
     </div>
     <div class="card-body p-0">
-        @if($messages->isEmpty())
+        <?php if($messages->isEmpty()): ?>
             <div class="text-center py-5">
                 <i class="bi bi-envelope-open display-1 text-muted"></i>
                 <h4 class="mt-3">Aucun message</h4>
                 <p class="text-muted">Il n'y a pas encore de messages sur la plateforme.</p>
             </div>
-        @else
+        <?php else: ?>
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead class="table-light">
@@ -95,60 +95,66 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($messages as $message)
+                        <?php $__currentLoopData = $messages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $message): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <tr>
                             <td>
                                 <div class="d-flex flex-column">
                                     <small>
                                         <i class="bi bi-arrow-right-circle-fill text-success me-1"></i>
-                                        <strong>De:</strong> {{ $message->sender->nom }}
-                                        <span class="badge bg-{{ $message->sender->role === 'apprenant' ? 'primary' : ($message->sender->role === 'formateur' ? 'success' : 'danger') }} bg-opacity-10">
-                                            {{ ucfirst($message->sender->role) }}
+                                        <strong>De:</strong> <?php echo e($message->sender->nom); ?>
+
+                                        <span class="badge bg-<?php echo e($message->sender->role === 'apprenant' ? 'primary' : ($message->sender->role === 'formateur' ? 'success' : 'danger')); ?> bg-opacity-10">
+                                            <?php echo e(ucfirst($message->sender->role)); ?>
+
                                         </span>
                                     </small>
                                     <small>
                                         <i class="bi bi-arrow-left-circle-fill text-warning me-1"></i>
-                                        <strong>À:</strong> {{ $message->receiver->nom }}
-                                        <span class="badge bg-{{ $message->receiver->role === 'apprenant' ? 'primary' : ($message->receiver->role === 'formateur' ? 'success' : 'danger') }} bg-opacity-10">
-                                            {{ ucfirst($message->receiver->role) }}
+                                        <strong>À:</strong> <?php echo e($message->receiver->nom); ?>
+
+                                        <span class="badge bg-<?php echo e($message->receiver->role === 'apprenant' ? 'primary' : ($message->receiver->role === 'formateur' ? 'success' : 'danger')); ?> bg-opacity-10">
+                                            <?php echo e(ucfirst($message->receiver->role)); ?>
+
                                         </span>
                                     </small>
                                 </div>
                             </td>
                             <td>
                                 <div class="message-preview">
-                                    @php
+                                    <?php
                                         $lines = explode("\n", $message->message, 2);
                                         $sujet = $lines[0] ?? '';
                                         $contenu = $lines[1] ?? $message->message;
-                                    @endphp
-                                    <strong>{{ Str::limit($sujet, 50) }}</strong>
+                                    ?>
+                                    <strong><?php echo e(Str::limit($sujet, 50)); ?></strong>
                                     <br>
-                                    <small class="text-muted">{{ Str::limit($contenu, 100) }}</small>
+                                    <small class="text-muted"><?php echo e(Str::limit($contenu, 100)); ?></small>
                                 </div>
                             </td>
                             <td>
-                                @if($message->lu)
+                                <?php if($message->lu): ?>
                                     <span class="badge bg-success">Lu</span>
-                                @else
+                                <?php else: ?>
                                     <span class="badge bg-warning">Non lu</span>
-                                @endif
+                                <?php endif; ?>
                             </td>
                             <td>
                                 <small>
-                                    <i class="bi bi-calendar"></i> {{ $message->created_at->format('d/m/Y') }}
+                                    <i class="bi bi-calendar"></i> <?php echo e($message->created_at->format('d/m/Y')); ?>
+
                                     <br>
-                                    <i class="bi bi-clock"></i> {{ $message->created_at->format('H:i') }}
+                                    <i class="bi bi-clock"></i> <?php echo e($message->created_at->format('H:i')); ?>
+
                                 </small>
                             </td>
                             <td>
                                 <div class="btn-group">
-                                    <a href="{{ route('admin.messages.show', $message) }}" class="btn btn-sm btn-outline-primary" title="Voir">
+                                    <a href="<?php echo e(route('admin.messages.show', $message)); ?>" class="btn btn-sm btn-outline-primary" title="Voir">
                                         <i class="bi bi-eye"></i>
                                     </a>
-                                    <form action="{{ route('admin.messages.destroy', $message) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
+                                    <form action="<?php echo e(route('admin.messages.destroy', $message)); ?>" method="POST" class="d-inline">
+                                        <?php echo csrf_field(); ?>
+                                        <?php echo method_field('DELETE'); ?>
                                         <button type="submit" class="btn btn-sm btn-outline-danger" title="Supprimer" onclick="return confirm('Supprimer ce message ?')">
                                             <i class="bi bi-trash"></i>
                                         </button>
@@ -156,16 +162,17 @@
                                 </div>
                             </td>
                         </tr>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </tbody>
                 </table>
             </div>
             
             <!-- Pagination -->
             <div class="d-flex justify-content-center p-3">
-                {{ $messages->links() }}
+                <?php echo e($messages->links()); ?>
+
             </div>
-        @endif
+        <?php endif; ?>
     </div>
 </div>
 
@@ -220,4 +227,5 @@
         padding: 0.4rem 0.8rem;
     }
 </style>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\HP\plateforme-formation\resources\views/admin/messages/index.blade.php ENDPATH**/ ?>

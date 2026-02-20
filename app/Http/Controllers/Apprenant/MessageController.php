@@ -23,7 +23,6 @@ class MessageController extends Controller
             ->orWhere('sender_id', $apprenant->id)
             ->with(['sender', 'receiver', 'formation']);
         
-        // Filtrer par conversation
         if ($request->filled('contact_id')) {
             $query->where(function($q) use ($request) {
                 $q->where('sender_id', $request->contact_id)
@@ -70,7 +69,7 @@ class MessageController extends Controller
     }
 
     /**
-     * Envoyer un nouveau message
+     * Envoyer un nouveau message - CORRIGÉ
      */
     public function store(Request $request)
     {
@@ -81,10 +80,13 @@ class MessageController extends Controller
             'contenu' => 'required|string',
         ]);
 
-        $validated['sender_id'] = Auth::id();
-        $validated['lu'] = false;
-
-        Message::create($validated);
+        Message::create([
+            'sender_id' => Auth::id(),
+            'receiver_id' => $request->receiver_id,
+            'formation_id' => $request->formation_id,
+            'message' => $request->sujet . "\n\n" . $request->contenu, // Combine sujet et contenu dans le champ 'message'
+            'lu' => false
+        ]);
 
         return redirect()->route('apprenant.messages.index')
             ->with('success', 'Message envoyé avec succès.');
@@ -109,6 +111,11 @@ class MessageController extends Controller
         
         $message->load(['sender', 'receiver', 'formation']);
         
+        // Séparer le sujet et le contenu (si stockés ensemble)
+        $parts = explode("\n\n", $message->message, 2);
+        $sujet = $parts[0] ?? '';
+        $contenu = $parts[1] ?? $message->message;
+        
         // Récupérer la conversation précédente
         $conversation = Message::where(function($q) use ($message, $apprenant) {
                 $q->where('sender_id', $message->sender_id)
@@ -123,7 +130,25 @@ class MessageController extends Controller
             ->take(10)
             ->get();
         
-        return view('apprenant.messages.show', compact('message', 'conversation'));
+        return view('apprenant.messages.show', compact('message', 'conversation', 'sujet', 'contenu'));
+    }
+
+    /**
+     * Supprimer un message
+     */
+    public function destroy(Message $message)
+    {
+        $apprenant = Auth::user();
+        
+        // Vérifier que l'apprenant est concerné par ce message
+        if ($message->sender_id != $apprenant->id && $message->receiver_id != $apprenant->id) {
+            abort(403);
+        }
+        
+        $message->delete();
+        
+        return redirect()->route('apprenant.messages.index')
+            ->with('success', 'Message supprimé avec succès.');
     }
 
     /**

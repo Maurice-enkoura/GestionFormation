@@ -91,6 +91,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/messages', [AdminMessageController::class, 'index'])->name('messages.index');
     Route::delete('/messages/{message}', [AdminMessageController::class, 'destroy'])->name('messages.destroy');
     Route::post('/messages/bannir/{user}', [AdminMessageController::class, 'bannirUtilisateur'])->name('messages.bannir');
+
+    Route::get('/messages', [AdminMessageController::class, 'index'])->name('messages.index');
+    Route::get('/messages/{message}', [AdminMessageController::class, 'show'])->name('messages.show'); // <- AJOUTER CETTE LIGNE
+    Route::delete('/messages/{message}', [AdminMessageController::class, 'destroy'])->name('messages.destroy');
     
     // Statistiques globales
     Route::get('/statistiques', [AdminDashboardController::class, 'statistiques'])->name('statistiques');

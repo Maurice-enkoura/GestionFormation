@@ -21,7 +21,7 @@ class MessageController extends Controller
         
         $query = Message::where('receiver_id', $formateur->id)
             ->orWhere('sender_id', $formateur->id)
-            ->with(['sender', 'receiver']);
+            ->with(['sender', 'receiver', 'formation']);
         
         // Filtrer par conversation
         if ($request->filled('contact_id')) {
@@ -36,7 +36,12 @@ class MessageController extends Controller
         // Récupérer les contacts uniques
         $contacts = $this->getContacts($formateur);
         
-        return view('formateur.messages.index', compact('messages', 'contacts'));
+        // Compter les messages non lus
+        $nonLus = Message::where('receiver_id', $formateur->id)
+            ->where('lu', false)
+            ->count();
+        
+        return view('formateur.messages.index', compact('messages', 'contacts', 'nonLus'));
     }
 
     /**
@@ -56,9 +61,33 @@ class MessageController extends Controller
             $message->update(['lu' => true]);
         }
         
-        $message->load(['sender', 'receiver']);
+        $message->load(['sender', 'receiver', 'formation']);
         
         return view('formateur.messages.show', compact('message'));
+    }
+
+    /**
+     * Afficher le formulaire de nouveau message
+     */
+    public function create(Request $request)
+    {
+        $formateur = Auth::user();
+        
+        // Récupérer les apprenants inscrits aux formations du formateur
+        $formationsIds = Formation::where('formateur_id', $formateur->id)->pluck('id');
+        
+        $apprenants = User::where('role', 'apprenant')
+            ->whereHas('inscriptions', function($q) use ($formationsIds) {
+                $q->whereIn('formation_id', $formationsIds);
+            })
+            ->get();
+        
+        $formations = Formation::where('formateur_id', $formateur->id)->get();
+        
+        $selectedApprenant = $request->get('apprenant_id');
+        $selectedFormation = $request->get('formation_id');
+        
+        return view('formateur.messages.create', compact('apprenants', 'formations', 'selectedApprenant', 'selectedFormation'));
     }
 
     /**
@@ -72,12 +101,34 @@ class MessageController extends Controller
             'formation_id' => 'nullable|exists:formations,id',
         ]);
 
-        $validated['sender_id'] = Auth::id();
-        $validated['lu'] = false;
+        Message::create([
+            'sender_id' => Auth::id(),
+            'receiver_id' => $request->receiver_id,
+            'formation_id' => $request->formation_id,
+            'message' => $request->message,
+            'lu' => false
+        ]);
 
-        Message::create($validated);
+        return redirect()->route('formateur.messages.index', ['contact_id' => $request->receiver_id])
+            ->with('success', 'Message envoyé avec succès.');
+    }
 
-        return redirect()->back()->with('success', 'Message envoyé avec succès.');
+    /**
+     * Supprimer un message
+     */
+    public function destroy(Message $message)
+    {
+        $formateur = Auth::user();
+        
+        // Vérifier que le formateur est concerné par ce message
+        if ($message->sender_id != $formateur->id && $message->receiver_id != $formateur->id) {
+            abort(403);
+        }
+        
+        $message->delete();
+        
+        return redirect()->route('formateur.messages.index')
+            ->with('success', 'Message supprimé avec succès.');
     }
 
     /**
@@ -97,6 +148,8 @@ class MessageController extends Controller
         
         $contactIds = array_unique(array_merge($sentIds, $receivedIds));
         
-        return User::whereIn('id', $contactIds)->get();
+        return User::whereIn('id', $contactIds)
+            ->select('id', 'nom', 'role')
+            ->get();
     }
 }

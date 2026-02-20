@@ -19,10 +19,7 @@ class MessageController extends Controller
         
         // Filtre par recherche
         if ($request->filled('search')) {
-            $query->where(function($q) use ($request) {
-                $q->where('contenu', 'like', '%' . $request->search . '%')
-                  ->orWhere('sujet', 'like', '%' . $request->search . '%');
-            });
+            $query->where('message', 'like', '%' . $request->search . '%');
         }
         
         // Filtre par utilisateur
@@ -33,7 +30,7 @@ class MessageController extends Controller
         
         $messages = $query->latest()->paginate(20);
         
-        // Statistiques simples
+        // Statistiques
         $stats = [
             'total' => Message::count(),
             'aujourd_hui' => Message::whereDate('created_at', today())->count(),
@@ -50,9 +47,14 @@ class MessageController extends Controller
      */
     public function show(Message $message)
     {
-        $message->load(['sender', 'receiver']);
+        $message->load(['sender', 'receiver', 'formation']);
         
-        return view('admin.messages.show', compact('message'));
+        // Extraire le sujet du message (première ligne)
+        $lines = explode("\n", $message->message, 2);
+        $sujet = $lines[0] ?? 'Message';
+        $contenu = $lines[1] ?? $message->message;
+        
+        return view('admin.messages.show', compact('message', 'sujet', 'contenu'));
     }
     
     /**

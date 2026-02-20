@@ -1,18 +1,19 @@
-{{-- resources/views/formateur/messages/index.blade.php --}}
-@extends('layouts.formateur')
 
-@section('title', 'Messages - Espace Formateur')
-@section('page-title', 'Boîte de réception')
-@section('page-subtitle', 'Formateur / Messages')
 
-@section('content')
+
+<?php $__env->startSection('title', 'Messages - Espace Formateur'); ?>
+<?php $__env->startSection('page-title', 'Boîte de réception'); ?>
+<?php $__env->startSection('page-subtitle', 'Formateur / Messages'); ?>
+
+<?php $__env->startSection('content'); ?>
 <div class="container-fluid">
-    @if(session('success'))
+    <?php if(session('success')): ?>
         <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
+            <?php echo e(session('success')); ?>
+
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
-    @endif
+    <?php endif; ?>
 
     <div class="row">
         <!-- Liste des contacts -->
@@ -22,17 +23,17 @@
                     <h5 class="mb-0">
                         <i class="bi bi-people me-2 text-primary"></i>
                         Conversations
-                        @if(isset($nonLus) && $nonLus > 0)
-                            <span class="badge bg-danger ms-2">{{ $nonLus }} non lu(s)</span>
-                        @endif
+                        <?php if(isset($nonLus) && $nonLus > 0): ?>
+                            <span class="badge bg-danger ms-2"><?php echo e($nonLus); ?> non lu(s)</span>
+                        <?php endif; ?>
                     </h5>
-                    <a href="{{ route('formateur.messages.create') }}" class="btn btn-sm btn-primary">
+                    <a href="<?php echo e(route('formateur.messages.create')); ?>" class="btn btn-sm btn-primary">
                         <i class="bi bi-plus-circle"></i> Nouveau
                     </a>
                 </div>
                 <div class="list-group list-group-flush" style="max-height: 500px; overflow-y: auto;">
-                    @forelse($contacts as $contact)
-                        @php
+                    <?php $__empty_1 = true; $__currentLoopData = $contacts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $contact): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                        <?php
                             // Utiliser le chemin complet avec App\Models\Message
                             $lastMessage = \App\Models\Message::where(function($q) use ($contact) {
                                 $formateurId = auth()->id();
@@ -44,38 +45,40 @@
                                 ->where('receiver_id', auth()->id())
                                 ->where('lu', false)
                                 ->count();
-                        @endphp
-                        <a href="{{ route('formateur.messages.index', ['contact_id' => $contact->id]) }}" 
-                           class="list-group-item list-group-item-action {{ request('contact_id') == $contact->id ? 'active' : '' }}">
+                        ?>
+                        <a href="<?php echo e(route('formateur.messages.index', ['contact_id' => $contact->id])); ?>" 
+                           class="list-group-item list-group-item-action <?php echo e(request('contact_id') == $contact->id ? 'active' : ''); ?>">
                             <div class="d-flex align-items-center">
                                 <div class="contact-avatar me-2">
-                                    {{ strtoupper(substr($contact->nom, 0, 2)) }}
+                                    <?php echo e(strtoupper(substr($contact->nom, 0, 2))); ?>
+
                                 </div>
                                 <div class="flex-grow-1">
                                     <div class="d-flex justify-content-between align-items-center">
-                                        <strong>{{ $contact->nom }}</strong>
-                                        @if($nonLuCount > 0)
-                                            <span class="badge bg-danger rounded-pill">{{ $nonLuCount }}</span>
-                                        @endif
+                                        <strong><?php echo e($contact->nom); ?></strong>
+                                        <?php if($nonLuCount > 0): ?>
+                                            <span class="badge bg-danger rounded-pill"><?php echo e($nonLuCount); ?></span>
+                                        <?php endif; ?>
                                     </div>
-                                    <small class="text-muted">{{ ucfirst($contact->role) }}</small>
-                                    @if($lastMessage)
+                                    <small class="text-muted"><?php echo e(ucfirst($contact->role)); ?></small>
+                                    <?php if($lastMessage): ?>
                                         <small class="d-block text-truncate text-muted">
-                                            {{ Str::limit($lastMessage->message, 30) }}
+                                            <?php echo e(Str::limit($lastMessage->message, 30)); ?>
+
                                         </small>
-                                    @endif
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </a>
-                    @empty
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                         <div class="list-group-item text-center py-4">
                             <i class="bi bi-chat display-4 text-muted"></i>
                             <p class="mt-2 text-muted">Aucune conversation</p>
-                            <a href="{{ route('formateur.messages.create') }}" class="btn btn-sm btn-primary">
+                            <a href="<?php echo e(route('formateur.messages.create')); ?>" class="btn btn-sm btn-primary">
                                 <i class="bi bi-plus-circle"></i> Commencer une conversation
                             </a>
                         </div>
-                    @endforelse
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -86,60 +89,62 @@
                 <div class="card-header bg-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">
                         <i class="bi bi-chat-dots me-2 text-primary"></i>
-                        @if(request('contact_id'))
-                            @php
+                        <?php if(request('contact_id')): ?>
+                            <?php
                                 $contact = \App\Models\User::find(request('contact_id'));
-                            @endphp
-                            Conversation avec <strong>{{ $contact->nom ?? 'Contact' }}</strong>
-                        @else
+                            ?>
+                            Conversation avec <strong><?php echo e($contact->nom ?? 'Contact'); ?></strong>
+                        <?php else: ?>
                             Messages
-                        @endif
+                        <?php endif; ?>
                     </h5>
                 </div>
                 
                 <div class="card-body" style="height: 400px; overflow-y: auto;" id="messageContainer">
-                    @if(request('contact_id'))
-                        @forelse($messages as $message)
-                            <div class="message-item {{ $message->sender_id == auth()->id() ? 'sent' : 'received' }} mb-3">
+                    <?php if(request('contact_id')): ?>
+                        <?php $__empty_1 = true; $__currentLoopData = $messages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $message): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                            <div class="message-item <?php echo e($message->sender_id == auth()->id() ? 'sent' : 'received'); ?> mb-3">
                                 <div class="message-bubble p-3">
                                     <div class="d-flex justify-content-between mb-2">
-                                        <strong>{{ $message->sender->nom }}</strong>
-                                        <small class="text-muted">{{ $message->created_at->format('d/m/Y H:i') }}</small>
+                                        <strong><?php echo e($message->sender->nom); ?></strong>
+                                        <small class="text-muted"><?php echo e($message->created_at->format('d/m/Y H:i')); ?></small>
                                     </div>
-                                    <p class="mb-0">{{ $message->message }}</p>
-                                    @if($message->formation)
+                                    <p class="mb-0"><?php echo e($message->message); ?></p>
+                                    <?php if($message->formation): ?>
                                         <small class="text-muted mt-2 d-block">
-                                            <i class="bi bi-book"></i> Formation: {{ $message->formation->titre }}
+                                            <i class="bi bi-book"></i> Formation: <?php echo e($message->formation->titre); ?>
+
                                         </small>
-                                    @endif
+                                    <?php endif; ?>
                                 </div>
                             </div>
-                        @empty
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                             <div class="text-center py-5">
                                 <i class="bi bi-chat display-1 text-muted"></i>
                                 <h5 class="mt-3">Aucun message</h5>
                                 <p class="text-muted">Commencez la conversation en envoyant un message</p>
                             </div>
-                        @endforelse
+                        <?php endif; ?>
                         
                         <!-- Pagination -->
                         <div class="d-flex justify-content-center mt-3">
-                            {{ $messages->links() }}
+                            <?php echo e($messages->links()); ?>
+
                         </div>
-                    @else
+                    <?php else: ?>
                         <div class="text-center py-5">
                             <i class="bi bi-chat display-1 text-muted"></i>
                             <h5 class="mt-3">Sélectionnez une conversation</h5>
                             <p class="text-muted">Choisissez un contact pour voir les messages</p>
                         </div>
-                    @endif
+                    <?php endif; ?>
                 </div>
 
-                @if(request('contact_id'))
+                <?php if(request('contact_id')): ?>
                 <div class="card-footer">
-                    <form action="{{ route('formateur.messages.store') }}" method="POST">
-                        @csrf
-                        <input type="hidden" name="receiver_id" value="{{ request('contact_id') }}">
+                    <form action="<?php echo e(route('formateur.messages.store')); ?>" method="POST">
+                        <?php echo csrf_field(); ?>
+                        <input type="hidden" name="receiver_id" value="<?php echo e(request('contact_id')); ?>">
                         <div class="input-group">
                             <input type="text" name="message" class="form-control" 
                                    placeholder="Votre message..." required autocomplete="off">
@@ -149,7 +154,7 @@
                         </div>
                     </form>
                 </div>
-                @endif
+                <?php endif; ?>
             </div>
         </div>
     </div>
@@ -185,7 +190,7 @@
     .message-bubble {
         max-width: 80%;
         border-radius: 18px;
-        background: {{ isset($message) && $message->sender_id == auth()->id() ? '#e3f2fd' : '#f8fafc' }};
+        background: <?php echo e(isset($message) && $message->sender_id == auth()->id() ? '#e3f2fd' : '#f8fafc'); ?>;
         border: 1px solid #eef2f6;
     }
     
@@ -219,7 +224,7 @@
     }
 </style>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script>
     // Auto-scroll vers le bas
     const container = document.getElementById('messageContainer');
@@ -235,5 +240,6 @@
         }
     }, 10000);
 </script>
-@endpush
-@endsection
+<?php $__env->stopPush(); ?>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.formateur', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\HP\plateforme-formation\resources\views/formateur/messages/index.blade.php ENDPATH**/ ?>
