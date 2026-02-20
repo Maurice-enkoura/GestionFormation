@@ -156,4 +156,62 @@ class AdminDashboardController extends Controller
             
         return round(($usersActifs / $totalUsers) * 100);
     }
+    
+
+    public function statistiques()
+{
+    // Totaux principaux
+    $totalUsers = User::count();
+    $totalFormations = Formation::count();
+    $totalInscriptions = Inscription::count();
+    $totalModules = Module::count();
+    $totalContenus = Contenu::count();
+
+    // Répartition des rôles
+    $repartitionRoles = [
+        'apprenants' => User::where('role', 'apprenant')->count(),
+        'formateurs' => User::where('role', 'formateur')->count(),
+        'admins' => User::where('role', 'admin')->count(),
+    ];
+
+    // Inscriptions par mois (année en cours)
+    $inscriptionsParMois = Inscription::select(
+            DB::raw('MONTH(created_at) as mois'),
+            DB::raw('COUNT(*) as total')
+        )
+        ->whereYear('created_at', now()->year)
+        ->groupBy('mois')
+        ->orderBy('mois')
+        ->pluck('total', 'mois')
+        ->toArray();
+
+    // Compléter les mois vides
+    $dataMensuelle = [];
+    for ($i = 1; $i <= 12; $i++) {
+        $dataMensuelle[] = $inscriptionsParMois[$i] ?? 0;
+    }
+
+    return view('admin.statistiques', [
+        'totalUsers' => $totalUsers,
+        'totalFormations' => $totalFormations,
+        'totalInscriptions' => $totalInscriptions,
+        'totalModules' => $totalModules,
+        'totalContenus' => $totalContenus,
+        'repartitionRoles' => $repartitionRoles,
+        'dataMensuelle' => $dataMensuelle
+    ]);
+}
+
+public function parametres()
+{
+    // Exemple : récupérer les paramètres généraux de la plateforme
+    $parametres = [
+        'nom_site' => config('app.name'),
+        'email_support' => 'support@example.com',
+        'langue_par_defaut' => 'fr',
+        'theme' => 'light'
+    ];
+
+    return view('admin.parametres', compact('parametres'));
+}
 }

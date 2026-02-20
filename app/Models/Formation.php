@@ -21,74 +21,62 @@ class Formation extends Model
         'date_fin'
     ];
 
-    // 🔹 Dire à Laravel que ces champs sont des dates
     protected $casts = [
-    'date_debut' => 'date',
-    'date_fin'   => 'date',
-];
+        'date_debut' => 'date',
+        'date_fin'   => 'date',
+    ];
 
-    // Relation avec formateur
+    /* ================= RELATIONS ================= */
+
     public function formateur()
     {
         return $this->belongsTo(User::class, 'formateur_id');
     }
 
-    // Relation avec les modules
     public function modules()
     {
         return $this->hasMany(Module::class);
     }
 
-    // Relation avec les inscriptions
     public function inscriptions()
     {
         return $this->hasMany(Inscription::class);
     }
 
-    // Apprenants inscrits
     public function apprenants()
     {
         return $this->belongsToMany(User::class, 'inscriptions', 'formation_id', 'user_id');
     }
 
-    /**
-     * Évaluations de la formation
-     */
     public function evaluations()
     {
         return $this->hasMany(Evaluation::class);
     }
 
-    /**
-     * Note moyenne de la formation
-     */
-    public function getNoteMoyenneAttribute()
+    /* ================= MÉTHODES MÉTIER (SAFE) ================= */
+
+    // ✅ appelé seulement si nécessaire
+    public function noteMoyenne()
     {
-        return $this->evaluations()->where('est_publiee', true)->avg('note') ?? 0;
+        return $this->evaluations()
+            ->where('est_publiee', true)
+            ->avg('note') ?? 0;
     }
 
-    /**
-     * Nombre total d'évaluations
-     */
-    public function getTotalEvaluationsAttribute()
+    public function totalEvaluations()
     {
-        return $this->evaluations()->where('est_publiee', true)->count();
+        return $this->evaluations()
+            ->where('est_publiee', true)
+            ->count();
     }
 
-    /**
-     * Distribution des notes (pour les graphiques)
-     */
-    public function getDistributionNotesAttribute()
+    public function distributionNotes()
     {
-        $distribution = [];
-        for ($i = 1; $i <= 5; $i++) {
-            $distribution[$i] = $this->evaluations()
-                ->where('est_publiee', true)
-                ->where('note', $i)
-                ->count();
-        }
-        return $distribution;
+        return $this->evaluations()
+            ->where('est_publiee', true)
+            ->selectRaw('note, COUNT(*) as total')
+            ->groupBy('note')
+            ->pluck('total', 'note')
+            ->toArray();
     }
-
-
 }

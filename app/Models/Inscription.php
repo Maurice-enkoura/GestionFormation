@@ -13,7 +13,8 @@ class Inscription extends Model
         'formation_id',
         'user_id',
         'date_inscription',
-        'statut'
+        'statut',
+        'progression'
     ];
 
     public function formation()

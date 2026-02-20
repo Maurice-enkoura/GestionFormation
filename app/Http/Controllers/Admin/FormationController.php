@@ -158,4 +158,20 @@ class FormationController extends Controller
         
         return view('admin.formations.statistiques', compact('formation', 'stats'));
     }
+
+    public function activer(Formation $formation)
+{
+    $formation->update(['est_active' => true]);
+    
+    return redirect()->back()
+        ->with('success', 'Formation activée avec succès.');
+}
+
+public function desactiver(Formation $formation)
+{
+    $formation->update(['est_active' => false]);
+    
+    return redirect()->back()
+        ->with('success', 'Formation désactivée avec succès.');
+}
 }
