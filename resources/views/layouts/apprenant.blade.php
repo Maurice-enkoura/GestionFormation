@@ -458,7 +458,13 @@
                     <span>Ressources</span>
                 </a>
             </li>
-            <!-- AJOUT : Messages -->
+              <li>
+        <a href="{{ route('apprenant.evaluations.index') }}" class="{{ request()->routeIs('apprenant.evaluations*') ? 'active' : '' }}" data-tooltip="Mes évaluations">
+            <i class="bi bi-star"></i>
+            <span>Mes évaluations</span>
+        </a>
+    </li>
+    
             <li>
                 <a href="{{ route('apprenant.messages.index') }}" class="{{ request()->routeIs('apprenant.messages*') ? 'active' : '' }}" data-tooltip="Messages">
                     <i class="bi bi-envelope"></i>

@@ -458,7 +458,13 @@
                     <span>Ressources</span>
                 </a>
             </li>
-            <!-- AJOUT : Messages -->
+              <li>
+        <a href="<?php echo e(route('apprenant.evaluations.index')); ?>" class="<?php echo e(request()->routeIs('apprenant.evaluations*') ? 'active' : ''); ?>" data-tooltip="Mes évaluations">
+            <i class="bi bi-star"></i>
+            <span>Mes évaluations</span>
+        </a>
+    </li>
+    
             <li>
                 <a href="<?php echo e(route('apprenant.messages.index')); ?>" class="<?php echo e(request()->routeIs('apprenant.messages*') ? 'active' : ''); ?>" data-tooltip="Messages">
                     <i class="bi bi-envelope"></i>

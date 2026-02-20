@@ -92,4 +92,14 @@ class EvaluationController extends Controller
         return redirect()->route('apprenant.formation.show', $evaluation->formation_id)
             ->with('success', 'Votre évaluation a été mise à jour.');
     }
+
+    public function index()
+{
+    $evaluations = Evaluation::where('user_id', Auth::id())
+        ->with('formation')
+        ->latest()
+        ->paginate(10);
+    
+    return view('apprenant.evaluations.index', compact('evaluations'));
+}
 }

@@ -31,9 +31,16 @@
                             <?php echo e($inscription->statut); ?>
 
                         </span>
-                        <a href="<?php echo e(route('apprenant.formation.show', $inscription->formation->id)); ?>" class="btn btn-sm btn-primary">
-                            Voir plus
-                        </a>
+                        <div>
+                            <a href="<?php echo e(route('apprenant.formation.show', $inscription->formation->id)); ?>" class="btn btn-sm btn-primary">
+                                Voir plus
+                            </a>
+                            <?php if($inscription->statut == 'termine'): ?>
+                                <a href="<?php echo e(route('apprenant.evaluations.create', $inscription->formation->id)); ?>" class="btn btn-sm btn-warning">
+                                    <i class="bi bi-star"></i> Évaluer
+                                </a>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -197,6 +197,10 @@ Route::middleware(['auth', 'apprenant'])->prefix('apprenant')->name('apprenant.'
     // Paramètres
     Route::get('/parametres', [ApprenantProfilController::class, 'settings'])->name('parametres');
     Route::put('/parametres', [ApprenantProfilController::class, 'updateSettings'])->name('parametres.update');
+
+
+     //Liste des évaluations de l'apprenant
+    Route::get('/evaluations', [App\Http\Controllers\Apprenant\EvaluationController::class, 'index'])->name('evaluations.index');
     
     // Activité récente
     Route::get('/activite', [ApprenantActiviteController::class, 'index'])->name('activite');

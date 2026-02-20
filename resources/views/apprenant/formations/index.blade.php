@@ -29,9 +29,16 @@
                         <span class="badge bg-{{ $inscription->statut == 'termine' ? 'success' : 'warning' }}">
                             {{ $inscription->statut }}
                         </span>
-                        <a href="{{ route('apprenant.formation.show', $inscription->formation->id) }}" class="btn btn-sm btn-primary">
-                            Voir plus
-                        </a>
+                        <div>
+                            <a href="{{ route('apprenant.formation.show', $inscription->formation->id) }}" class="btn btn-sm btn-primary">
+                                Voir plus
+                            </a>
+                            @if($inscription->statut == 'termine')
+                                <a href="{{ route('apprenant.evaluations.create', $inscription->formation->id) }}" class="btn btn-sm btn-warning">
+                                    <i class="bi bi-star"></i> Évaluer
+                                </a>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>
