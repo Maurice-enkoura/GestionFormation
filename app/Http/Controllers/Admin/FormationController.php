@@ -12,11 +12,13 @@ use Illuminate\Support\Facades\DB;
 class FormationController extends Controller
 {
     /**
-     * Affiche la liste des formations
+     * Affiche la liste des formations (CORRIGÉ)
      */
     public function index(Request $request)
     {
-        $query = Formation::with('formateur', 'modules');
+        $query = Formation::with('formateur:id,nom,email')
+            ->withCount('modules')
+            ->withCount('inscriptions');
         
         // Filtre par recherche
         if ($request->filled('search')) {
@@ -30,11 +32,14 @@ class FormationController extends Controller
         
         $formations = $query->latest()->paginate(15);
         
-        $formateurs = User::where('role', 'formateur')->get();
+        $formateurs = User::where('role', 'formateur')
+            ->select('id', 'nom', 'email')
+            ->get();
         
+        // Statistiques CORRIGÉES (sans est_active)
         $stats = [
             'total' => Formation::count(),
-            'publiees' => Formation::count(),
+            'publiees' => Formation::count(), // Temporairement égal au total
             'inscriptions' => Formation::withCount('inscriptions')->get()->sum('inscriptions_count'),
         ];
         
@@ -46,7 +51,9 @@ class FormationController extends Controller
      */
     public function create()
     {
-        $formateurs = User::where('role', 'formateur')->get();
+        $formateurs = User::where('role', 'formateur')
+            ->select('id', 'nom')
+            ->get();
         return view('admin.formations.create', compact('formateurs'));
     }
     
@@ -66,7 +73,7 @@ class FormationController extends Controller
         $formation = Formation::create($validated);
         
         return redirect()->route('admin.formations.edit', $formation)
-            ->with('success', 'Formation créée avec succès. Vous pouvez maintenant ajouter des modules.');
+            ->with('success', 'Formation créée avec succès.');
     }
     
     /**
@@ -74,15 +81,19 @@ class FormationController extends Controller
      */
     public function show(Formation $formation)
     {
-        $formation->load(['formateur', 'modules.contenus', 'inscriptions.user']);
+        $formation->load([
+            'formateur:id,nom,email',
+            'modules' => function($query) {
+                $query->withCount('contenus');
+            },
+            'inscriptions.user:id,nom,email'
+        ]);
         
         $stats = [
-            'total_inscrits' => $formation->inscriptions()->count(),
-            'progression_moyenne' => 75, // À calculer selon votre logique
+            'total_inscrits' => $formation->inscriptions_count ?? $formation->inscriptions->count(),
+            'progression_moyenne' => $this->calculerProgressionMoyenne($formation),
             'nombre_modules' => $formation->modules->count(),
-            'nombre_contenus' => $formation->modules->sum(function($module) {
-                return $module->contenus->count();
-            }),
+            'nombre_contenus' => $formation->modules->sum('contenus_count'),
         ];
         
         return view('admin.formations.show', compact('formation', 'stats'));
@@ -93,8 +104,10 @@ class FormationController extends Controller
      */
     public function edit(Formation $formation)
     {
-        $formation->load('modules.contenus');
-        $formateurs = User::where('role', 'formateur')->get();
+        $formation->loadCount('modules');
+        $formateurs = User::where('role', 'formateur')
+            ->select('id', 'nom')
+            ->get();
         
         return view('admin.formations.edit', compact('formation', 'formateurs'));
     }
@@ -123,11 +136,38 @@ class FormationController extends Controller
      */
     public function destroy(Formation $formation)
     {
+        // Supprimer d'abord les inscriptions, modules et contenus (cascade)
         $formation->delete();
         
         return redirect()->route('admin.formations.index')
             ->with('success', 'Formation supprimée avec succès.');
     }
+    
+    /**
+     * Active une formation - Commenté en attendant la colonne
+     */
+    /*
+    public function activer(Formation $formation)
+    {
+        $formation->update(['est_active' => true]);
+        
+        return redirect()->back()
+            ->with('success', 'Formation activée avec succès.');
+    }
+    */
+    
+    /**
+     * Désactive une formation - Commenté en attendant la colonne
+     */
+    /*
+    public function desactiver(Formation $formation)
+    {
+        $formation->update(['est_active' => false]);
+        
+        return redirect()->back()
+            ->with('success', 'Formation désactivée avec succès.');
+    }
+    */
     
     /**
      * Affiche les statistiques d'une formation
@@ -142,36 +182,69 @@ class FormationController extends Controller
             ->whereYear('created_at', now()->year)
             ->groupBy('mois')
             ->orderBy('mois')
-            ->get();
+            ->get()
+            ->keyBy('mois');
+        
+        // Préparer les données pour le graphique (12 mois)
+        $mois = [];
+        $donnees = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $mois[] = $this->getMoisEnLettres($i);
+            $donnees[] = $inscriptionsParMois[$i]->total ?? 0;
+        }
         
         $stats = [
             'total_inscrits' => $formation->inscriptions_count,
-            'taux_completion' => 75, // À calculer
+            'taux_completion' => $this->calculerTauxCompletion($formation),
             'progression_modules' => $formation->modules->map(function($module) {
                 return [
                     'titre' => $module->titre,
                     'completion' => rand(60, 100) // À remplacer par vraies données
                 ];
             }),
-            'inscriptions_mensuelles' => $inscriptionsParMois,
+            'inscriptions_mensuelles' => [
+                'labels' => $mois,
+                'data' => $donnees
+            ],
         ];
         
         return view('admin.formations.statistiques', compact('formation', 'stats'));
     }
-
-    public function activer(Formation $formation)
-{
-    $formation->update(['est_active' => true]);
     
-    return redirect()->back()
-        ->with('success', 'Formation activée avec succès.');
-}
-
-public function desactiver(Formation $formation)
-{
-    $formation->update(['est_active' => false]);
+    /**
+     * Calcule la progression moyenne des apprenants
+     */
+    private function calculerProgressionMoyenne(Formation $formation)
+    {
+        // À implémenter selon votre logique
+        return 75;
+    }
     
-    return redirect()->back()
-        ->with('success', 'Formation désactivée avec succès.');
-}
+    /**
+     * Calcule le taux de complétion
+     */
+    private function calculerTauxCompletion(Formation $formation)
+    {
+        $totalInscrits = $formation->inscriptions()->count();
+        if ($totalInscrits == 0) return 0;
+        
+        $termines = $formation->inscriptions()
+            ->where('statut', 'termine')
+            ->count();
+            
+        return round(($termines / $totalInscrits) * 100);
+    }
+    
+    /**
+     * Convertit le numéro du mois en lettres
+     */
+    private function getMoisEnLettres($mois)
+    {
+        $moisListe = [
+            1 => 'Jan', 2 => 'Fév', 3 => 'Mar', 4 => 'Avr',
+            5 => 'Mai', 6 => 'Juin', 7 => 'Juil', 8 => 'Aoû',
+            9 => 'Sep', 10 => 'Oct', 11 => 'Nov', 12 => 'Déc'
+        ];
+        return $moisListe[$mois] ?? '';
+    }
 }

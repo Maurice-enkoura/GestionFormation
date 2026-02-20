@@ -1,67 +1,68 @@
-{{-- resources/views/formateur/formations/index.blade.php --}}
-@extends('layouts.formateur')
 
-@section('title', 'Mes formations - Espace Formateur')
 
-@section('page-title', 'Mes formations')
-@section('page-subtitle', 'Formateur / Formations')
 
-@section('content')
+<?php $__env->startSection('title', 'Mes formations - Espace Formateur'); ?>
+
+<?php $__env->startSection('page-title', 'Mes formations'); ?>
+<?php $__env->startSection('page-subtitle', 'Formateur / Formations'); ?>
+
+<?php $__env->startSection('content'); ?>
 <!-- Header avec bouton de création - SEUL EN-TÊTE -->
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h3 class="fw-bold mb-1">Liste de vos formations</h3>
-        <p class="text-muted">{{ now()->locale('fr')->isoFormat('dddd D MMMM YYYY') }}</p>
+        <p class="text-muted"><?php echo e(now()->locale('fr')->isoFormat('dddd D MMMM YYYY')); ?></p>
     </div>
-    <a href="{{ route('formateur.formations.create') }}" class="btn btn-success">
+    <a href="<?php echo e(route('formateur.formations.create')); ?>" class="btn btn-success">
         <i class="bi bi-plus-circle me-2"></i>Nouvelle formation
     </a>
 </div>
 
 <!-- Liste des formations -->
 <div class="row g-4">
-    @forelse($formations as $formation)
+    <?php $__empty_1 = true; $__currentLoopData = $formations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $formation): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
     <div class="col-md-6 col-lg-4">
         <div class="formation-card">
-            <div class="formation-image" style="background-image: url('{{ $formation->image_url ?? 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400' }}')">
-                <span class="formation-badge {{ $formation->date_debut && $formation->date_debut->isPast() ? 'badge-active' : 'badge-draft' }}">
-                    {{ $formation->date_debut && $formation->date_debut->isPast() ? 'Publiée' : 'Brouillon' }}
+            <div class="formation-image" style="background-image: url('<?php echo e($formation->image_url ?? 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400'); ?>')">
+                <span class="formation-badge <?php echo e($formation->date_debut && $formation->date_debut->isPast() ? 'badge-active' : 'badge-draft'); ?>">
+                    <?php echo e($formation->date_debut && $formation->date_debut->isPast() ? 'Publiée' : 'Brouillon'); ?>
+
                 </span>
             </div>
             <div class="formation-content">
-                <h4 class="formation-title">{{ $formation->titre }}</h4>
+                <h4 class="formation-title"><?php echo e($formation->titre); ?></h4>
                 <div class="formation-stats">
-                    <span><i class="bi bi-people"></i> {{ $formation->inscriptions_count ?? 0 }} inscrits</span>
-                    <span><i class="bi bi-collection"></i> {{ $formation->modules_count ?? 0 }} modules</span>
-                    @if($formation->date_debut)
-                        <span><i class="bi bi-calendar"></i> {{ $formation->date_debut->format('d/m/Y') }}</span>
-                    @endif
+                    <span><i class="bi bi-people"></i> <?php echo e($formation->inscriptions_count ?? 0); ?> inscrits</span>
+                    <span><i class="bi bi-collection"></i> <?php echo e($formation->modules_count ?? 0); ?> modules</span>
+                    <?php if($formation->date_debut): ?>
+                        <span><i class="bi bi-calendar"></i> <?php echo e($formation->date_debut->format('d/m/Y')); ?></span>
+                    <?php endif; ?>
                 </div>
-                <p class="text-muted small">{{ Str::limit($formation->description, 80) }}</p>
+                <p class="text-muted small"><?php echo e(Str::limit($formation->description, 80)); ?></p>
                 
                 <!-- Progression des apprenants (simulée) -->
-                @php
+                <?php
                     $avgProgress = rand(30, 90); // À remplacer par une vraie stats
-                @endphp
+                ?>
                 <div class="progress-container mb-3">
                     <div class="progress-info">
                         <span>Progression moyenne</span>
-                        <span>{{ $avgProgress }}%</span>
+                        <span><?php echo e($avgProgress); ?>%</span>
                     </div>
                     <div class="progress-bar-custom">
-                        <div class="progress-fill" style="width: {{ $avgProgress }}%"></div>
+                        <div class="progress-fill" style="width: <?php echo e($avgProgress); ?>%"></div>
                     </div>
                 </div>
                 
                 <div class="formation-footer">
-                    <a href="{{ route('formateur.formations.show', $formation) }}" class="btn-edit">
+                    <a href="<?php echo e(route('formateur.formations.show', $formation)); ?>" class="btn-edit">
                         <i class="bi bi-eye me-1"></i> Voir détails
                     </a>
                     <div class="btn-group">
-                        <a href="{{ route('formateur.formations.edit', $formation) }}" class="btn-stats" data-tooltip="Modifier">
+                        <a href="<?php echo e(route('formateur.formations.edit', $formation)); ?>" class="btn-stats" data-tooltip="Modifier">
                             <i class="bi bi-pencil"></i>
                         </a>
-                        <button type="button" class="btn-stats text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $formation->id }}" data-tooltip="Supprimer">
+                        <button type="button" class="btn-stats text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal<?php echo e($formation->id); ?>" data-tooltip="Supprimer">
                             <i class="bi bi-trash"></i>
                         </button>
                     </div>
@@ -71,7 +72,7 @@
     </div>
 
     <!-- Modal de confirmation de suppression -->
-    <div class="modal fade" id="deleteModal{{ $formation->id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="deleteModal<?php echo e($formation->id); ?>" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -79,43 +80,44 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Êtes-vous sûr de vouloir supprimer la formation <strong>"{{ $formation->titre }}"</strong> ?</p>
+                    <p>Êtes-vous sûr de vouloir supprimer la formation <strong>"<?php echo e($formation->titre); ?>"</strong> ?</p>
                     <p class="text-danger"><small>Cette action est irréversible et supprimera également tous les modules et contenus associés.</small></p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <form action="{{ route('formateur.formations.destroy', $formation) }}" method="POST">
-                        @csrf
-                        @method('DELETE')
+                    <form action="<?php echo e(route('formateur.formations.destroy', $formation)); ?>" method="POST">
+                        <?php echo csrf_field(); ?>
+                        <?php echo method_field('DELETE'); ?>
                         <button type="submit" class="btn btn-danger">Supprimer</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-    @empty
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
     <div class="col-12">
         <div class="empty-state text-center py-5">
             <i class="bi bi-folder2-open display-1 text-muted"></i>
             <h4 class="mt-3">Aucune formation</h4>
             <p class="text-muted">Vous n'avez pas encore créé de formation.</p>
-            <a href="{{ route('formateur.formations.create') }}" class="btn btn-success mt-3">
+            <a href="<?php echo e(route('formateur.formations.create')); ?>" class="btn btn-success mt-3">
                 <i class="bi bi-plus-circle me-2"></i>Créer ma première formation
             </a>
         </div>
     </div>
-    @endforelse
+    <?php endif; ?>
 </div>
 
 <!-- Pagination -->
-@if(isset($formations) && method_exists($formations, 'links'))
+<?php if(isset($formations) && method_exists($formations, 'links')): ?>
 <div class="d-flex justify-content-center mt-5">
-    {{ $formations->links() }}
+    <?php echo e($formations->links()); ?>
+
 </div>
-@endif
+<?php endif; ?>
 
 <!-- Scripts pour les tooltips -->
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script>
     // Initialiser les tooltips Bootstrap
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-tooltip]'))
@@ -123,7 +125,7 @@
         return new bootstrap.Tooltip(tooltipTriggerEl)
     });
 </script>
-@endpush
+<?php $__env->stopPush(); ?>
 
 <style>
     .formation-card {
@@ -328,4 +330,5 @@
         transform: translateX(-50%) translateY(-8px);
     }
 </style>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.formateur', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\HP\plateforme-formation\resources\views/formateur/formations/index.blade.php ENDPATH**/ ?>

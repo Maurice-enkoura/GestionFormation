@@ -9,6 +9,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Font Awesome for WhatsApp icon (alternative) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- AOS Animation -->
@@ -26,6 +28,7 @@
             --success: #22c55e;
             --warning: #f59e0b;
             --danger: #ef4444;
+            --whatsapp: #25D366;
         }
 
         * {
@@ -39,6 +42,88 @@
             color: var(--dark);
             overflow-x: hidden;
             background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+        }
+
+        /* WhatsApp Float Button */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: var(--whatsapp);
+            color: white;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            text-align: center;
+            font-size: 30px;
+            box-shadow: 0 10px 30px rgba(37, 211, 102, 0.4);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            animation: pulse-whatsapp 2s infinite;
+        }
+
+        .whatsapp-float:hover {
+            transform: scale(1.1) rotate(5deg);
+            background-color: #20ba5c;
+            color: white;
+            box-shadow: 0 15px 40px rgba(37, 211, 102, 0.6);
+        }
+
+        @keyframes pulse-whatsapp {
+            0% {
+                box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 20px rgba(37, 211, 102, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
+            }
+        }
+
+        /* WhatsApp Chat Button */
+        .btn-whatsapp {
+            background-color: var(--whatsapp);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 60px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-whatsapp:hover {
+            background-color: #20ba5c;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(37, 211, 102, 0.3);
+        }
+
+        /* WhatsApp Group Badge */
+        .whatsapp-group-badge {
+            background: rgba(37, 211, 102, 0.1);
+            color: var(--whatsapp);
+            padding: 0.5rem 1rem;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid rgba(37, 211, 102, 0.2);
+            backdrop-filter: blur(10px);
+            margin-bottom: 1rem;
+        }
+
+        .whatsapp-group-badge i {
+            color: var(--whatsapp);
         }
 
         /* Navbar */
@@ -1018,6 +1103,11 @@
             border-color: transparent;
         }
 
+        /* WhatsApp Social Link */
+        .social-links a.whatsapp-social:hover {
+            background: var(--whatsapp);
+        }
+
         .copyright {
             text-align: center;
             padding-top: 3rem;
@@ -1152,10 +1242,27 @@
             .search-btn {
                 width: 100%;
             }
+
+            .whatsapp-float {
+                width: 50px;
+                height: 50px;
+                font-size: 25px;
+                bottom: 15px;
+                right: 15px;
+            }
         }
     </style>
 </head>
 <body>
+
+<!-- WhatsApp Floating Button -->
+<a href="https://wa.me/33123456789?text=Bonjour%20EduForm%2C%20j'aimerais%20avoir%20des%20informations%20sur%20vos%20formations." 
+   class="whatsapp-float" 
+   target="_blank"
+   data-aos="fade-up"
+   data-aos-delay="500">
+    <i class="fab fa-whatsapp"></i>
+</a>
 
 <!-- Navigation -->
 <nav class="navbar navbar-expand-lg fixed-top" id="mainNav">
@@ -1582,6 +1689,19 @@
                         <h3>Parlons de votre projet</h3>
                         <p>Que vous soyez un apprenant ou un formateur, nous sommes là pour échanger avec vous.</p>
                         
+                        <!-- WhatsApp dans les coordonnées -->
+                        <div class="contact-detail">
+                            <i class="fab fa-whatsapp"></i>
+                            <div>
+                                <strong>WhatsApp</strong>
+                                <p class="mb-0">
+                                    <a href="https://wa.me/33123456789" target="_blank" class="text-white text-decoration-none">
+                                        +33 1 23 45 67 89
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                        
                         <div class="contact-detail">
                             <i class="bi bi-geo-alt"></i>
                             <div>
@@ -1613,6 +1733,8 @@
                                 <p class="mb-0">Lun-Ven: 9h-18h</p>
                             </div>
                         </div>
+
+                        
                     </div>
                 </div>
                 
@@ -1666,6 +1788,9 @@
                     <a href="#"><i class="bi bi-twitter-x"></i></a>
                     <a href="#"><i class="bi bi-linkedin"></i></a>
                     <a href="#"><i class="bi bi-instagram"></i></a>
+                    <a href="https://wa.me/33123456789" class="whatsapp-social" target="_blank">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
                 </div>
             </div>
             
@@ -1697,6 +1822,12 @@
                     <button class="btn btn-primary" type="button">
                         <i class="bi bi-send"></i>
                     </button>
+                </div>
+                <!-- WhatsApp Group Link -->
+                <div class="mt-3">
+                    <a href="https://chat.whatsapp.com/your-group-link" class="text-white-50 text-decoration-none small" target="_blank">
+                        <i class="fab fa-whatsapp me-1"></i> Rejoindre notre groupe WhatsApp
+                    </a>
                 </div>
             </div>
         </div>
@@ -1733,6 +1864,13 @@
             if (target) {
                 target.scrollIntoView({ behavior: 'smooth' });
             }
+        });
+    });
+
+    // WhatsApp button click tracking
+    document.querySelectorAll('.whatsapp-float, .btn-whatsapp, .whatsapp-social').forEach(btn => {
+        btn.addEventListener('click', function() {
+            console.log('WhatsApp button clicked');
         });
     });
 </script>
