@@ -18,7 +18,8 @@ class Formation extends Model
         'description',
         'formateur_id',
         'date_debut',
-        'date_fin'
+        'date_fin',
+        'est_active',
     ];
 
     protected $casts = [

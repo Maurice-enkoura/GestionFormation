@@ -1,5 +1,5 @@
 <?php
-
+// app/Http/Controllers/Admin/FormationController.php
 
 namespace App\Http\Controllers\Admin;
 
@@ -20,12 +20,10 @@ class FormationController extends Controller
             ->withCount('modules')
             ->withCount('inscriptions');
         
-        // Filtre par recherche
         if ($request->filled('search')) {
             $query->where('titre', 'like', '%' . $request->search . '%');
         }
         
-        // Filtre par formateur
         if ($request->filled('formateur_id')) {
             $query->where('formateur_id', $request->formateur_id);
         }
@@ -36,7 +34,6 @@ class FormationController extends Controller
             ->select('id', 'nom', 'email')
             ->get();
         
-        // Statistiques CORRIGÉES (sans est_active)
         $stats = [
             'total' => Formation::count(),
             'publiees' => Formation::count(), 
@@ -69,6 +66,9 @@ class FormationController extends Controller
             'date_debut' => 'required|date',
             'date_fin' => 'required|date|after:date_debut',
         ]);
+        
+        // Par défaut, une nouvelle formation est active
+        $validated['est_active'] = true;
         
         $formation = Formation::create($validated);
         
@@ -136,7 +136,6 @@ class FormationController extends Controller
      */
     public function destroy(Formation $formation)
     {
-        // Supprimer d'abord les inscriptions, modules et contenus (cascade)
         $formation->delete();
         
         return redirect()->route('admin.formations.index')
@@ -144,30 +143,29 @@ class FormationController extends Controller
     }
     
     /**
-     * Active une formation - Commenté en attendant la colonne
+     * Active une formation - DÉCOMMENTÉ
      */
-    /*
-    public function activer(Formation $formation)
-    {
-        $formation->update(['est_active' => true]);
-        
-        return redirect()->back()
-            ->with('success', 'Formation activée avec succès.');
-    }
-    */
-    
     /**
-     * Désactive une formation - Commenté en attendant la colonne
-     */
-    /*
-    public function desactiver(Formation $formation)
-    {
-        $formation->update(['est_active' => false]);
-        
-        return redirect()->back()
-            ->with('success', 'Formation désactivée avec succès.');
-    }
-    */
+ * Active une formation
+ */
+public function activer(Formation $formation)
+{
+    $formation->update(['est_active' => true]);
+    
+    return redirect()->back()
+        ->with('success', 'Formation activée avec succès.');
+}
+
+/**
+ * Désactive une formation
+ */
+public function desactiver(Formation $formation)
+{
+    $formation->update(['est_active' => false]);
+    
+    return redirect()->back()
+        ->with('success', 'Formation désactivée avec succès.');
+}
     
     /**
      * Affiche les statistiques d'une formation
@@ -176,7 +174,6 @@ class FormationController extends Controller
     {
         $formation->loadCount('inscriptions');
         
-        // Statistiques des inscriptions par mois
         $inscriptionsParMois = $formation->inscriptions()
             ->select(DB::raw('MONTH(created_at) as mois'), DB::raw('COUNT(*) as total'))
             ->whereYear('created_at', now()->year)
@@ -185,7 +182,6 @@ class FormationController extends Controller
             ->get()
             ->keyBy('mois');
         
-        // Préparer les données pour le graphique (12 mois)
         $mois = [];
         $donnees = [];
         for ($i = 1; $i <= 12; $i++) {
@@ -199,7 +195,7 @@ class FormationController extends Controller
             'progression_modules' => $formation->modules->map(function($module) {
                 return [
                     'titre' => $module->titre,
-                    'completion' => rand(60, 100) // À remplacer par vraies données
+                    'completion' => rand(60, 100)
                 ];
             }),
             'inscriptions_mensuelles' => [
@@ -216,7 +212,6 @@ class FormationController extends Controller
      */
     private function calculerProgressionMoyenne(Formation $formation)
     {
-        // À implémenter selon votre logique
         return 75;
     }
     
