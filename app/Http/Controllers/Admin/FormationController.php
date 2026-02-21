@@ -1,5 +1,5 @@
 <?php
-// app/Http/Controllers/Admin/FormationController.php
+
 
 namespace App\Http\Controllers\Admin;
 
@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 class FormationController extends Controller
 {
     /**
-     * Affiche la liste des formations (CORRIGÉ)
+     * Affiche la liste des formations 
      */
     public function index(Request $request)
     {
@@ -39,7 +39,7 @@ class FormationController extends Controller
         // Statistiques CORRIGÉES (sans est_active)
         $stats = [
             'total' => Formation::count(),
-            'publiees' => Formation::count(), // Temporairement égal au total
+            'publiees' => Formation::count(), 
             'inscriptions' => Formation::withCount('inscriptions')->get()->sum('inscriptions_count'),
         ];
         

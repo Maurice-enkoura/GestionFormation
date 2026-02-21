@@ -265,7 +265,7 @@
     <div class="register-container">
         <div class="register-card">
             <div class="logo">
-                <a href="{{ route('home') }}">
+                <a href="<?php echo e(route('home')); ?>">
                     <i class="bi bi-mortarboard-fill"></i>
                     <span>EduForm</span>
                 </a>
@@ -274,41 +274,62 @@
             <h1 class="text-center">Inscription</h1>
             <p class="subtitle text-center">Rejoignez notre communauté d'apprenants</p>
 
-            @if($errors->any())
+            <?php if($errors->any()): ?>
                 <div class="alert alert-danger">
-                    @foreach($errors->all() as $error)
-                        <p class="mb-0"><i class="bi bi-exclamation-circle me-2"></i>{{ $error }}</p>
-                    @endforeach
+                    <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <p class="mb-0"><i class="bi bi-exclamation-circle me-2"></i><?php echo e($error); ?></p>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>
-            @endif
+            <?php endif; ?>
 
-            <form method="POST" action="{{ route('register') }}">
-                @csrf
+            <form method="POST" action="<?php echo e(route('register')); ?>">
+                <?php echo csrf_field(); ?>
 
                 <div class="input-group">
                     <span class="input-group-text"><i class="bi bi-person"></i></span>
                     <input type="text" 
-                           class="form-control @error('nom') is-invalid @enderror" 
+                           class="form-control <?php $__errorArgs = ['nom'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" 
                            name="nom" 
                            placeholder="Nom complet"
-                           value="{{ old('nom') }}"
+                           value="<?php echo e(old('nom')); ?>"
                            required>
                 </div>
 
                 <div class="input-group">
                     <span class="input-group-text"><i class="bi bi-envelope"></i></span>
                     <input type="email" 
-                           class="form-control @error('email') is-invalid @enderror" 
+                           class="form-control <?php $__errorArgs = ['email'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" 
                            name="email" 
                            placeholder="Adresse email"
-                           value="{{ old('email') }}"
+                           value="<?php echo e(old('email')); ?>"
                            required>
                 </div>
 
                 <div class="input-group">
                     <span class="input-group-text"><i class="bi bi-lock"></i></span>
                     <input type="password" 
-                           class="form-control @error('password') is-invalid @enderror" 
+                           class="form-control <?php $__errorArgs = ['password'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" 
                            name="password" 
                            placeholder="Mot de passe"
                            required>
@@ -332,13 +353,12 @@
                     <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
                     <select name="role" class="form-select" required>
                         <option value="">Choisissez votre rôle</option>
-                        <option value="apprenant" {{ old('role') == 'apprenant' ? 'selected' : '' }}>
+                        <option value="apprenant" <?php echo e(old('role') == 'apprenant' ? 'selected' : ''); ?>>
                             Apprenant <span class="role-badge apprenant">👨‍🎓</span>
                         </option>
-<!--
-                         <option value="formateur" {{ old('role') == 'formateur' ? 'selected' : '' }}>
+                        <option value="formateur" <?php echo e(old('role') == 'formateur' ? 'selected' : ''); ?>>
                             Formateur <span class="role-badge formateur">👨‍🏫</span>
-                        </option>--->
+                        </option>
                     </select>
                 </div>
 
@@ -358,17 +378,17 @@
                 <div class="links">
                     <p class="mb-0">
                         Déjà inscrit ? 
-                        <a href="{{ route('login') }}">Se connecter</a>
+                        <a href="<?php echo e(route('login')); ?>">Se connecter</a>
                     </p>
                 </div>
             </form>
         </div>
 
         <div class="back-home">
-            <a href="{{ route('home') }}">
+            <a href="<?php echo e(route('home')); ?>">
                 <i class="bi bi-arrow-left"></i>Retour à l'accueil
             </a>
         </div>
     </div>
 </body>
-</html>
+</html><?php /**PATH C:\Users\HP\plateforme-formation\resources\views/auth/register.blade.php ENDPATH**/ ?>
